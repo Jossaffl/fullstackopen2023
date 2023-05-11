@@ -1,18 +1,29 @@
-const NameForm = ({newValue, newValueState, personState, setPersonState}) => {
+import axios from "axios"
+
+import { getAll, createNew, ModifyEntry } from "../Services/Persons"
+
+
+const NameForm = ({newValue, newValueState, personState, setPersonState, setNotification}) => { 
 
     const NewForm = (e) => {
       e.preventDefault()
-      const {name, number} = newValue
 
+      const {name, number} = newValue
       const directoryObject = { name: name, number: number }
 
       if(personState.some(person => Object.values(person).includes(name))){
-        alert(`${name} already exists!`)
-        newValueState( {name: "", number: ""})
+
+        const toModify = personState.filter(e => e.name === name)
+
+        if (window.confirm(`Are you sure to want to update the number for ${name}`)){
+          ModifyEntry(toModify[0].id, directoryObject, personState, setPersonState, setNotification, name)
+          newValueState( {name: "", number: ""})
+        }
+        
       }
 
       else {
-        setPersonState(personState.concat(directoryObject))
+        createNew(directoryObject, personState, setPersonState, setNotification, name)
         newValueState( {name: "", number: ""})
       }
     }
